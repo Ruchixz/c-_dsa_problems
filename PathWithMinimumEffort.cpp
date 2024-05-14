@@ -1,21 +1,29 @@
+//{ Driver Code Starts
 #include <bits/stdc++.h>
 using namespace std;
 
-class Matrix {
-  public:
+class Matrix
+{
+public:
     template <class T>
-    static void input(vector<vector<T>> &A, int n, int m) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
+    static void input(vector<vector<T>> &A, int n, int m)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
                 scanf("%d ", &A[i][j]);
             }
         }
     }
 
     template <class T>
-    static void print(vector<vector<T>> &A) {
-        for (int i = 0; i < A.size(); i++) {
-            for (int j = 0; j < A[i].size(); j++) {
+    static void print(vector<vector<T>> &A)
+    {
+        for (int i = 0; i < A.size(); i++)
+        {
+            for (int j = 0; j < A[i].size(); j++)
+            {
                 cout << A[i][j] << " ";
             }
             cout << endl;
@@ -23,67 +31,72 @@ class Matrix {
     }
 };
 
-
 // } Driver Code Ends
 
-class Solution {
-  public:
-    int MinimumEffort(int rows, int columns, vector<vector<int>> &heights) {
-        // code here
-         priority_queue<pair<int,pair<int,int>>, vector<pair<int,pair<int,int>>>,
-            greater<pair<int,pair<int,int>>>> pq;
-        int r = heights.size();
-        int c= heights[0].size();
-        vector<vector<int>>dist(r,vector<int>(c,INT_MAX));
-        dist[0][0] = 0;
-        pq.push({0,{0,0}});
-        while(!pq.empty()){
-            auto temp = pq.top();
-            pq.pop();
-            int diff = temp.first;
-            int row = temp.second.first;
-            int col = temp.second.second;
-            if(row == r-1 and col == c-1) return diff;
-            if(row>0){
-                int newEffort = max(abs(heights[row][col] - heights[row-1][col] ), diff);
-                if(newEffort<dist[row-1][col]){
-                    dist[row-1][col] = newEffort;
-                    pq.push({newEffort,{row-1,col}});
-                }
+class Solution
+{
+public:
+    bool possible(vector<vector<int>> &height, int k)
+    {
+        queue<pair<int, int>> q;
+        q.push({0, 0});
+        vector<vector<int>> visited(height.size(), vector<int>(height[0].size(), 0));
+        while (!q.empty())
+        {
+            int i = q.front().first;
+            int j = q.front().second;
+            q.pop();
+            if (i == height.size() - 1 && j == height[0].size() - 1)
+                return true;
+            if (i + 1 < height.size() && abs(height[i][j] - height[i + 1][j]) <= k && !visited[i + 1][j])
+            {
+                visited[i + 1][j] = 1;
+                q.push({i + 1, j});
             }
-            if(col>0){
-                int newEffort = max(abs(heights[row][col] - heights[row][col-1] ), diff);
-                if(newEffort<dist[row][col-1]){
-                    dist[row][col-1] = newEffort;
-                    pq.push({newEffort,{row,col-1}});
-                }
+            if (j + 1 < height[0].size() && abs(height[i][j] - height[i][j + 1]) <= k && !visited[i][j + 1])
+            {
+                visited[i][j + 1] = 1;
+                q.push({i, j + 1});
             }
-            if(row<r-1){
-                int newEffort = max(abs(heights[row][col] - heights[row+1][col] ), diff);
-                if(newEffort<dist[row+1][col]){
-                    dist[row+1][col] = newEffort;
-                    pq.push({newEffort,{row+1,col}});
-                }
+            if (i > 0 && abs(height[i][j] - height[i - 1][j]) <= k && !visited[i - 1][j])
+            {
+                visited[i - 1][j] = 1;
+                q.push({i - 1, j});
             }
-            if(col<c-1){
-                int newEffort = max(abs(heights[row][col] - heights[row][col+1] ), diff);
-                if(newEffort<dist[row][col+1]){
-                    dist[row][col+1] = newEffort;
-                    pq.push({newEffort,{row,col+1}});
-                }
+            if (j > 0 && abs(height[i][j] - height[i][j - 1]) <= k && !visited[i][j - 1])
+            {
+                visited[i][j - 1] = 1;
+                q.push({i, j - 1});
             }
         }
-        return 0;
+        return false;
+    }
+    int MinimumEffort(int rows, int columns, vector<vector<int>> &heights)
+    {
+        int start = 0, end = 1e6, ans = 1e6;
+        while (start <= end)
+        {
+            int mid = start + (end - start) / 2;
+            if (possible(heights, mid))
+            {
+                ans = mid;
+                end = mid - 1;
+            }
+            else
+                start = mid + 1;
+        }
+        return ans;
     }
 };
 
-
 //{ Driver Code Starts.
 
-int main() {
+int main()
+{
     int t;
     scanf("%d ", &t);
-    while (t--) {
+    while (t--)
+    {
 
         int rows;
         scanf("%d", &rows);
@@ -101,3 +114,4 @@ int main() {
     }
 }
 
+// } Driver Code Ends
